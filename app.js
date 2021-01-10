@@ -8,13 +8,7 @@ const moment = require('moment');
 
 const bodyParser = require('body-parser');
 
-const adminRoutes = require("./routes/admin");
-
 const userRoutes = require("./routes/user");
-
-const shopRoutes = require("./routes/shop");
-
-const staticRoutes = require("./routes/static");
 
 const errorController = require("./controllers/404");
 
@@ -29,10 +23,6 @@ app.use('/users', userRoutes);
 // app.set('view engine', 'ejs');
 
 // app.set('views', 'views');
-
-// app.use('/admin', adminRoutes);
-
-// app.use(shopRoutes);
 
 // app.use(staticRoutes);
 
