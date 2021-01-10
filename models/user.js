@@ -42,7 +42,7 @@ module.exports = class User {
   }
 
   static findUserByEmailPass(email, pass) {
-    return db.execute("SELECT * FROM users WHERE email_address = ?, password = ? LIMIT 1", [email, pass]);
+    return db.execute("SELECT * FROM users WHERE email_address = ? AND password = ? LIMIT 1", [email, pass]);
   }
 
 };

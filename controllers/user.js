@@ -9,12 +9,52 @@ const responseFormat = {
   "data": {}
 };
 
+const emailRegexp = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+
 exports.userHome = (req, res, next) => {
   return res.status(200).json({"status":200, "msg":"Welcome to chatterbox"});
 };
 
 exports.login = (req, res, next) => {
-  return res.status(200).json({"status":200, "msg":"Welcome to chatterbox login"});
+  let email = req.body.email;
+  let pass = req.body.pass;
+  if(typeof email == 'undefined' || email == '' || typeof pass == 'undefined' || pass == ''){
+    responseFormat.status_code = 400;
+    responseFormat.message = "Please enter email address and password";
+    return res.status(400).json(responseFormat);
+  }
+  if(!emailRegexp.test(email)){
+    responseFormat.status_code = 400;
+    responseFormat.message = "Please enter valid email address";
+    return res.status(400).json(responseFormat);
+  }
+  User.findUserByEmailPass(email, pass)
+  .then(([results, fieldData])=>{
+    
+    if(results.length == 0){
+      responseFormat.status_code = 400;
+      responseFormat.message = "Incorrect email address or password";
+      return res.status(400).json(responseFormat);
+    }
+    else if(results[0].active != 1){
+      responseFormat.status_code = 400;
+      responseFormat.message = "Your account is inactive or suspended";
+      return res.status(400).json(responseFormat);
+    }
+    else{
+      responseFormat.success = true;
+      responseFormat.status_code = 200;
+      responseFormat.message = 'User login successfully';
+      responseFormat.data = {
+        "first_name":results[0].first_name,
+        "last_name":results[0].last_name,
+        "email_address":results[0].email_address
+      }
+      return res.status(200).json(responseFormat);
+    }
+  }).catch((loginErr)=>{
+    console.log("loginErr", loginErr);
+  })
 };
 
 exports.register = (req, res, next) => {
@@ -57,7 +97,7 @@ exports.register = (req, res, next) => {
     responseFormat.message = "Password and confirm password should be same";
     return res.status(400).json(responseFormat);
   }
-  const emailRegexp = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+  
   if(!emailRegexp.test(email_address)){
     responseFormat.status_code = 400;
     responseFormat.message = "Please provide valid email address";
