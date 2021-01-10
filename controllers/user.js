@@ -30,15 +30,26 @@ exports.login = (req, res, next) => {
   }
   User.findUserByEmailPass(email, pass)
   .then(([results, fieldData])=>{
+    
     if(results.length == 0){
       responseFormat.status_code = 400;
       responseFormat.message = "Incorrect email address or password";
+      return res.status(400).json(responseFormat);
+    }
+    else if(results[0].active != 1){
+      responseFormat.status_code = 400;
+      responseFormat.message = "Your account is inactive or suspended";
       return res.status(400).json(responseFormat);
     }
     else{
       responseFormat.success = true;
       responseFormat.status_code = 200;
       responseFormat.message = 'User login successfully';
+      responseFormat.data = {
+        "first_name":results[0].first_name,
+        "last_name":results[0].last_name,
+        "email_address":results[0].email_address
+      }
       return res.status(200).json(responseFormat);
     }
   }).catch((loginErr)=>{
