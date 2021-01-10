@@ -138,7 +138,6 @@ exports.register = (req, res, next) => {
           if(err) throw err; 
           User.addUser(first_name, last_name, email_address, hashPassword)
           .then((result) => {
-              console.log("addUser success", result);
               responseFormat.success = true;
               responseFormat.status_code = 200;
               responseFormat.message = 'User registered successfully';
