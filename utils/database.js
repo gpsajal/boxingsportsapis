@@ -3,6 +3,6 @@ const pool = mysql.createPool({
     host:'localhost',
     user:'root',
     password:'',
-    database:'udemy-nodejs'
+    database:'chatterboxsports'
 });
 module.exports = pool.promise();
