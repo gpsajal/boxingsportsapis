@@ -6,6 +6,10 @@ const app = express();
 
 const moment = require('moment'); 
 
+const port = process.env.PORT || 4040;
+
+console.log("Custom PORT", process.env.PORT);
+
 const bodyParser = require('body-parser');
 
 const userRoutes = require("./routes/user");
@@ -35,6 +39,6 @@ app.use('/users', userRoutes);
 
 // app.use(errorController.get404);
 
-app.listen(2020, (req, res)=>{
-    console.log("Node server listening on 2020",moment().format('YYYY-MM-DD HH:mm:ss'));
+app.listen(port, (req, res)=>{
+    console.log(`Node server listening on ${port}`,moment().format('YYYY-MM-DD HH:mm:ss'));
 });

@@ -86,6 +86,7 @@ exports.register = (req, res, next) => {
   let confirm_email_address = req.body.confirm_email_address;
   let password = req.body.password;
   let confirm_password = req.body.confirm_password;
+  let stripeToken = req.body.stripeToken;
 
   if(typeof first_name == 'undefined' || first_name == ''){
     responseFormat.status_code = 400;
@@ -122,11 +123,15 @@ exports.register = (req, res, next) => {
     responseFormat.status_code = 400;
     responseFormat.message = "Password and confirm password should be same";
     return res.status(400).json(responseFormat);
-  }
-  
+  }  
   if(!emailRegexp.test(email_address)){
     responseFormat.status_code = 400;
     responseFormat.message = "Please provide valid email address";
+    return res.status(400).json(responseFormat);
+  }
+  if(typeof stripeToken == 'undefined'){
+    responseFormat.status_code = 400;
+    responseFormat.message = "Please provide valid payment method";
     return res.status(400).json(responseFormat);
   }
 
@@ -137,49 +142,35 @@ exports.register = (req, res, next) => {
         bcrypt.hash(password, salt, (err, hashPassword) => {
           if(err) throw err; 
           User.addUser(first_name, last_name, email_address, hashPassword)
-          .then((result) => {
-              stripe.paymentMethods.create({
-                type: 'card',
-                card: {
-                  number: '4242424242424242',
-                  exp_month: 1,
-                  exp_year: 2022,
-                  cvc: '314',
-                },
+          .then((addUserResp) => {
+            console.log("addUserResp", addUserResp);
+              stripe.customers.create({
+                email: email_address,
+                payment_method:stripeToken,
+                invoice_settings:{
+                  default_payment_method:stripeToken
+                }
               })
-              .then((pmResp)=>{
-                console.log("pmResp", pmResp.id);
-                stripe.customers.create({
-                  email: email_address,
-                  payment_method:pmResp.id,
-                  invoice_settings:{
-                    default_payment_method:pmResp.id
-                  }
-                })
-                .then((customerResp)=>{
-                  console.log("customerResp", customerResp.id);
-                  if(typeof customerResp.id != 'undefined'){
-                    stripe.subscriptions.create({
-                      customer: customerResp.id,
-                      items: [{
-                        plan: 'price_1I8if2GV54ADk0vhZb4NjcQa',
-                      }],
-                      expand:['latest_invoice.payment_intent']
-                    })
-                    .then((subscriptionResp)=>{
-                      console.log("subscriptionResp", subscriptionResp.id);
-                    })
-                    .catch((subscriptionErr)=>{
-                      console.log("subscriptionErr", subscriptionErr);
-                    });
-                  }
-                })
-                .catch((custErr)=>{
-                  console.error("Stripe customer err", custErr);
-                });
+              .then((customerResp)=>{
+                console.log("customerResp", customerResp.id);
+                if(typeof customerResp.id != 'undefined'){
+                  stripe.subscriptions.create({
+                    customer: customerResp.id,
+                    items: [{
+                      plan: 'price_1I8if2GV54ADk0vhZb4NjcQa',
+                    }],
+                    expand:['latest_invoice.payment_intent']
+                  })
+                  .then((subscriptionResp)=>{
+                    console.log("subscriptionResp", subscriptionResp.id);
+                  })
+                  .catch((subscriptionErr)=>{
+                    console.log("subscriptionErr", subscriptionErr);
+                  });
+                }
               })
-              .catch((pmErr)=>{
-                console.error("Stripe pm err", pmErr);
+              .catch((custErr)=>{
+                console.error("Stripe customer err", custErr);
               });
               responseFormat.success = true;
               responseFormat.status_code = 200;
