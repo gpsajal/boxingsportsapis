@@ -163,19 +163,22 @@ exports.register = (req, res, next) => {
                   })
                   .then((subscriptionResp)=>{
                     console.log("subscriptionResp", subscriptionResp.id);
+                    responseFormat.success = true;
+                    responseFormat.status_code = 200;
+                    responseFormat.message = 'User registered successfully';
+                    return res.status(200).json(responseFormat);
                   })
-                  .catch((subscriptionErr)=>{
+                  .catch((subscriptionErr)=>{                    
                     console.log("subscriptionErr", subscriptionErr);
+                    responseFormat.status_code = 400;
+                    responseFormat.message = "Please provide valid payment method";
+                    return res.status(400).json(responseFormat);
                   });
                 }
               })
               .catch((custErr)=>{
                 console.error("Stripe customer err", custErr);
               });
-              responseFormat.success = true;
-              responseFormat.status_code = 200;
-              responseFormat.message = 'User registered successfully';
-              return res.status(200).json(responseFormat);
           })
           .catch((userErr) => {
             console.log("userErr", userErr);
