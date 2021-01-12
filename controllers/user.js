@@ -4,6 +4,8 @@ const nodemailer = require('nodemailer');
 
 const bcrypt = require('bcryptjs')
 
+const stripe = require('stripe')('sk_test_7NCES0u1Pbt5phZulTRnPe3A');
+
 const emailRegexp = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
 
 exports.userHome = (req, res, next) => {
@@ -71,14 +73,12 @@ exports.login = (req, res, next) => {
 };
 
 exports.register = (req, res, next) => {
-
   var responseFormat = {
     "success": false,
     "status_code":'',
     "message": "",
     "data": {}
   };
-
   console.log("Inside register...");
   let first_name = req.body.first_name;
   let last_name = req.body.last_name;
@@ -138,6 +138,49 @@ exports.register = (req, res, next) => {
           if(err) throw err; 
           User.addUser(first_name, last_name, email_address, hashPassword)
           .then((result) => {
+              stripe.paymentMethods.create({
+                type: 'card',
+                card: {
+                  number: '4242424242424242',
+                  exp_month: 1,
+                  exp_year: 2022,
+                  cvc: '314',
+                },
+              })
+              .then((pmResp)=>{
+                console.log("pmResp", pmResp.id);
+                stripe.customers.create({
+                  email: email_address,
+                  payment_method:pmResp.id,
+                  invoice_settings:{
+                    default_payment_method:pmResp.id
+                  }
+                })
+                .then((customerResp)=>{
+                  console.log("customerResp", customerResp.id);
+                  if(typeof customerResp.id != 'undefined'){
+                    stripe.subscriptions.create({
+                      customer: customerResp.id,
+                      items: [{
+                        plan: 'price_1I8if2GV54ADk0vhZb4NjcQa',
+                      }],
+                      expand:['latest_invoice.payment_intent']
+                    })
+                    .then((subscriptionResp)=>{
+                      console.log("subscriptionResp", subscriptionResp.id);
+                    })
+                    .catch((subscriptionErr)=>{
+                      console.log("subscriptionErr", subscriptionErr);
+                    });
+                  }
+                })
+                .catch((custErr)=>{
+                  console.error("Stripe customer err", custErr);
+                });
+              })
+              .catch((pmErr)=>{
+                console.error("Stripe pm err", pmErr);
+              });
               responseFormat.success = true;
               responseFormat.status_code = 200;
               responseFormat.message = 'User registered successfully';
