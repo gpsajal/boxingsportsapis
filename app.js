@@ -6,6 +6,8 @@ const app = express();
 
 const moment = require('moment'); 
 
+require('dotenv').config();
+
 const port = process.env.PORT || 2020;
 
 console.log("Custom PORT", process.env.PORT);

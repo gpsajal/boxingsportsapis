@@ -4,7 +4,7 @@ const nodemailer = require('nodemailer');
 
 const bcrypt = require('bcryptjs')
 
-const stripe = require('stripe')('sk_test_7NCES0u1Pbt5phZulTRnPe3A');
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 const emailRegexp = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
 
@@ -69,7 +69,6 @@ exports.login = (req, res, next) => {
   .catch((loginErr)=>{
     console.log("loginErr", loginErr);
   })
-
 };
 
 exports.register = (req, res, next) => {
@@ -138,7 +137,7 @@ exports.register = (req, res, next) => {
   User.findUserByEmail(email_address)
   .then(([emailResults, fieldData])=>{
     if(emailResults.length == 0){
-      bcrypt.genSalt(10, (err, salt) => {
+      bcrypt.genSalt(process.env.SALT_ROUNDS, (err, salt) => {
         bcrypt.hash(password, salt, (err, hashPassword) => {
           if(err) throw err; 
           User.addUser(first_name, last_name, email_address, hashPassword)
@@ -200,5 +199,4 @@ exports.register = (req, res, next) => {
     responseFormat.message = "Internal server error";
     return res.status(400).json(responseFormat);
   });
-
 };
