@@ -165,7 +165,7 @@ exports.register = (req, res, next) => {
                     console.log("subscriptionResp", subscriptionResp.id);
                     responseFormat.success = true;
                     responseFormat.status_code = 200;
-                    responseFormat.message = 'User registered successfully';
+                    responseFormat.message = 'User registered successfully and payment done!';
                     return res.status(200).json(responseFormat);
                   })
                   .catch((subscriptionErr)=>{                    
