@@ -8,7 +8,7 @@ const moment = require('moment');
 
 require('dotenv').config();
 
-const port = process.env.PORT || 2020;
+const port = process.env.PORT || 5050;
 
 console.log("Custom PORT", process.env.PORT);
 
