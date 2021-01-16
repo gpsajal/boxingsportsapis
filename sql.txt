@@ -1,2 +1,0 @@
-ALTER TABLE `users`  ADD `active` INT(1) NOT NULL DEFAULT '0' COMMENT '0-pending, 1-active, 2-suspend'  AFTER `password`;
-
