@@ -137,7 +137,7 @@ exports.register = (req, res, next) => {
   User.findUserByEmail(email_address)
   .then(([emailResults, fieldData])=>{
     if(emailResults.length == 0){
-      bcrypt.genSalt(process.env.SALT_ROUNDS, (err, salt) => {
+      bcrypt.genSalt(parseInt(process.env.SALT_ROUNDS), (err, salt) => {
         bcrypt.hash(password, salt, (err, hashPassword) => {
           if(err) throw err; 
           User.addUser(first_name, last_name, email_address, hashPassword)
