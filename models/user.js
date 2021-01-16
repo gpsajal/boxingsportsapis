@@ -10,16 +10,6 @@ const p = path.join(
   'products.json'
 );
 
-const getProductsFromFile = cb => {
-  fs.readFile(p, (err, fileContent) => {
-    if (err) {
-      cb([]);
-    } else {
-      cb(JSON.parse(fileContent));
-    }
-  });
-};
-
 module.exports = class User {
   constructor(first_name, last_name, email_address, password) {
     this.first_name = first_name;

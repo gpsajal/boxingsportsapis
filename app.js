@@ -33,6 +33,11 @@ app.use(function(req, res, next) {
 
 app.use('/users', userRoutes);
 
+app.get('/', (req, res)=>{
+  return res.redirect('/users');
+});
+
+
 // app.set('view engine', 'ejs');
 
 // app.set('views', 'views');
