@@ -58,7 +58,7 @@ exports.login = (req, res) => {
           var jwtToken = jwt.sign({
             userid: results[0].id,
             email: results[0].email_address,
-          }, process.env.JWT_SECRET);
+          }, process.env.JWT_SECRET, {expiresIn: '3600s'});
           responseFormat.data = {
             "first_name":results[0].first_name,
             "last_name":results[0].last_name,
