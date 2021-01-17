@@ -1,6 +1,10 @@
 const User = require('../models/user');
 
+require('dotenv').config();
+
 const nodemailer = require('nodemailer');
+
+var jwt = require('jsonwebtoken');
 
 const bcrypt = require('bcryptjs')
 
@@ -8,11 +12,11 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 const emailRegexp = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
 
-exports.userHome = (req, res, next) => {
+exports.userHome = (req, res) => {
   return res.status(200).json({"status":200, "msg":"Welcome to chatterbox"});
 };
 
-exports.login = (req, res, next) => {
+exports.login = (req, res) => {
 
   var responseFormat = {
     "success": false,
@@ -50,11 +54,16 @@ exports.login = (req, res, next) => {
         if(isPasswordMatch){
           responseFormat.success = true;
           responseFormat.status_code = 200;
-          responseFormat.message = 'User login successfully';
+          responseFormat.message = 'User login successfully';          
+          var jwtToken = jwt.sign({
+            userid: results[0].id,
+            email: results[0].email_address,
+          }, process.env.JWT_SECRET);
           responseFormat.data = {
             "first_name":results[0].first_name,
             "last_name":results[0].last_name,
-            "email_address":results[0].email_address
+            "email_address":results[0].email_address,
+            "token": jwtToken
           }
           return res.status(200).json(responseFormat);
         }
@@ -71,7 +80,7 @@ exports.login = (req, res, next) => {
   })
 };
 
-exports.register = (req, res, next) => {
+exports.register = (req, res) => {
   var responseFormat = {
     "success": false,
     "status_code":'',
@@ -199,4 +208,11 @@ exports.register = (req, res, next) => {
     responseFormat.message = "Internal server error";
     return res.status(400).json(responseFormat);
   });
+};
+
+exports.myProfile = (req, res)=>{
+  
+  return res.json({"response":"authorization succeed"});
+
+
 };
