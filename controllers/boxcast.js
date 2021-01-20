@@ -49,20 +49,38 @@ const getAuthToken = async () => {
  */
 exports.channelsList = async (req, res) => {
     console.log("inside channelsList....");
+    var responseFormat = {
+        "success": false,
+        "status_code":'',
+        "message": "",
+        "data": {}
+      };
     try {
         const token = await getAuthToken()
         const headers = {
             'Authorization': `Bearer ${token}`
         }
-        const channels = await r2('https://api.boxcast.com/account/channels', { headers }).json
-        return res.json({
-            data: channels,
-            code: 200,
-            status: 'SUCCESS',
-            message: 'All channels fetched successfully.'
-        })
+        const channels = await r2('https://api.boxcast.com/account/channels', { headers }).json;
+
+        var responseFormat = {
+            "success": true,
+            "status_code":200,
+            "message": "All channels fetched successfully.",
+            "data": channels
+        };
+        return res.status(400).json(responseFormat);
+
+        // return res.json({
+        //     data: channels,
+        //     code: 200,
+        //     status: 'SUCCESS',
+        //     message: 'All channels fetched successfully.'
+        // })
     } catch (error) {
-        logger.error(error)
-        return res.status(500).json(utils.serverErrorMsg(error))
+        logger.error(error);
+        responseFormat.status_code = 400;
+        responseFormat.message = utils.serverErrorMsg(error);
+        return res.status(500).json(responseFormat);
+        //return res.status(500).json(utils.serverErrorMsg(error))
     }
 };
