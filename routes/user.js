@@ -10,11 +10,17 @@ const express = require("express");
 
 const userController = require("../controllers/user");
 
+const boxcastController = require("../controllers/boxcast");
+
 const router = express.Router();
 
 router.get('/', userController.userHome);
 
 router.post('/login', userController.login);
+
+router.post('/login', userController.login);
+
+router.get(`/channels`, boxcastController.channelsList);
 
 router.post('/register', userController.register);
 
