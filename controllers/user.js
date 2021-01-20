@@ -13,7 +13,7 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const emailRegexp = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
 
 exports.userHome = (req, res) => {
-  return res.status(200).json({"status":200, "msg":"Welcome to chatterbox"});
+  return res.status(200).json({"status":200, "msg":`Welcome to chatterbox APIs on ${process.env.NODE_ENV} environment!`});
 };
 
 exports.login = (req, res) => {
