@@ -22,6 +22,8 @@ router.post('/login', userController.login);
 
 router.get(`/channels`, boxcastController.channelsList);
 
+router.get('/broadcasts', boxcastController.broadcastsList);
+
 router.post('/register', userController.register);
 
 router.post('/profile', verifyAuthToken, userController.myProfile);
