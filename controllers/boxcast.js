@@ -48,7 +48,7 @@ const getAuthToken = async () => {
  * API to get all channel list
  */
 exports.channelsList = async (req, res) => {
-    console.log("inside channelsList....");
+    console.log("Channel listing here....");
     var responseFormat = {
         "success": false,
         "status_code":'',
@@ -85,7 +85,6 @@ exports.channelsList = async (req, res) => {
     }
 };
 
-
 /**
  * API to get all broadcasts list
  */
@@ -111,18 +110,43 @@ exports.broadcastsList = async (req, res) => {
             "data": broadcasts
         };
         return res.status(400).json(responseFormat);
-
-        // return res.json({
-        //     data: channels,
-        //     code: 200,
-        //     status: 'SUCCESS',
-        //     message: 'All channels fetched successfully.'
-        // })
     } catch (error) {
         logger.error(error);
         responseFormat.status_code = 400;
         responseFormat.message = utils.serverErrorMsg(error);
         return res.status(500).json(responseFormat);
-        //return res.status(500).json(utils.serverErrorMsg(error))
+    }
+};
+
+/**
+ * API to get channel detail
+ */
+exports.channelDetails = async (req, res) => {
+    console.log("inside channelDetails....");
+    var responseFormat = {
+        "success": false,
+        "status_code":'',
+        "message": "",
+        "data": {}
+      };
+    try {
+        const channelId = req.params.id;
+        const token = await getAuthToken()
+        const headers = {
+            'Authorization': `Bearer ${token}`
+        }
+        const channelDetails = await r2(`https://api.boxcast.com/account/channels/${channelId}`, { headers }).json;
+        var responseFormat = {
+            "success": true,
+            "status_code":200,
+            "message": "Channel detail fetched successfully.",
+            "data": channelDetails
+        };
+        return res.status(400).json(responseFormat);
+    } catch (error) {
+        logger.error(error);
+        responseFormat.status_code = 400;
+        responseFormat.message = utils.serverErrorMsg(error);
+        return res.status(500).json(responseFormat);
     }
 };
