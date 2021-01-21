@@ -121,8 +121,14 @@ exports.broadcastsList = async (req, res) => {
 /**
  * API to get channel detail
  */
-exports.channelDetails = async (req, res) => {
-    console.log("inside channelDetails....");
+exports.channelVideos = async (req, res) => {
+    console.log("inside channelVideos....");
+
+    const sortField = req.query.sort || '-starts_at'
+    const limit = req.query.limit || '50'
+    const page = req.query.page || '0'
+    const search = req.query.search || ''
+
     var responseFormat = {
         "success": false,
         "status_code":'',
@@ -130,19 +136,31 @@ exports.channelDetails = async (req, res) => {
         "data": {}
       };
     try {
-        const channelId = req.params.id;
+        const channelType = typeof req.params.type != 'undefined' ? parseInt(req.params.type) : 1;
+        let channelId = '';
+        if(channelType == 1){ // Live
+            channelId = 'x4hskyp019znhujikckx';
+        }
+        else{
+            channelId = 'qcttyqg1w3rqumbdxojb';
+        }
+        console.log("channelType....", channelType);
         const token = await getAuthToken()
         const headers = {
             'Authorization': `Bearer ${token}`
         }
-        const channelDetails = await r2(`https://api.boxcast.com/account/channels/${channelId}`, { headers }).json;
+        https://api.boxcast.com/channels/x4hskyp019znhujikckx/broadcasts?q=timeframe%3Arelevant%20timeframe%3Anext&s=-starts_at&l=5&p=0
+
+        var channelAllVideos = await r2(`https://api.boxcast.com/account/channels/${channelId}/broadcasts`, { headers }).json;
+        //var channelAllVideos = await r2(`https://api.boxcast.com/account/channels/${channelId}/broadcasts?l=${limit}&p=${page}&s=${sortField}`,{ headers }).json;
+
         var responseFormat = {
             "success": true,
             "status_code":200,
             "message": "Channel detail fetched successfully.",
-            "data": channelDetails
+            "data": channelAllVideos
         };
-        return res.status(400).json(responseFormat);
+        return res.status(200).json(responseFormat);
     } catch (error) {
         logger.error(error);
         responseFormat.status_code = 400;
