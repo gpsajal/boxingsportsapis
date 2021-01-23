@@ -149,8 +149,8 @@ exports.channelVideos = async (req, res) => {
             channelId = process.env.INSTANT_VIDEOS;
         }
         else if(channelType == 3){
-            channelId = process.env.CHANNEL_LIVE;
-            responseFormat.total_records = 123;
+            channelId = process.env.CHANNEL_LIVE_PLUS;
+            responseFormat.total_records = 132;
         }
         
         const token = await getAuthToken()
