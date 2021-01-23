@@ -165,7 +165,7 @@ exports.channelVideos = async (req, res) => {
             // The whole response has been received. Print out the result.
             boxCastResp.on('end', () => {
                 let TotalRecords = JSON.parse(data).length;
-                var responseFormat = {
+                responseFormat = {
                     "success": true,
                     "status_code":200,
                     "message": TotalRecords > 0 ? "Record(s) found." : 'No record(s) found',
@@ -176,6 +176,9 @@ exports.channelVideos = async (req, res) => {
         })
         .on("error", (err) => {
             console.log("BoxCast Error: ", err.message);
+            responseFormat.status_code = 400;
+            responseFormat.message = utils.serverErrorMsg(err);
+            return res.status(500).json(responseFormat);
         });       
     } catch (error) {
         console.log("channelVideos Err", error);
