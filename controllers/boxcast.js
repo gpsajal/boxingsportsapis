@@ -143,7 +143,7 @@ exports.channelVideos = async (req, res) => {
       };
     try {
         const channelType = typeof req.params.type != 'undefined' ? parseInt(req.params.type) : 1;
-        console.log("channelType...........", channelType);
+        //console.log("channelType...........", channelType);
         let channelId = '';
         if(channelType == 1){ // Live
             channelId = process.env.CHANNEL_LIVE;
@@ -166,7 +166,7 @@ exports.channelVideos = async (req, res) => {
             'Authorization': `Bearer ${token}`
         }
         let BoxCastAPiUrl = `https://api.boxcast.com/channels/${channelId}/broadcasts?s=${sortField}&p=${page}&l=${limit}`;
-        console.log("BoxCastAPiUrl...........", BoxCastAPiUrl);
+        //console.log("BoxCastAPiUrl...........", BoxCastAPiUrl);
         https.get(BoxCastAPiUrl, (boxCastResp)=>{
             let data = '';
             // A chunk of data has been received.
@@ -186,7 +186,7 @@ exports.channelVideos = async (req, res) => {
                         if(prevDate < element.starts_at){
                             recentVideos.push(element);
                         }
-                        console.log("allVideoResults...........", element); 
+                        //console.log("allVideoResults...........", element); 
                     });
                     responseFormat.total_records = recentVideos.length;
                     responseFormat.data = recentVideos;
