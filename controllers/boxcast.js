@@ -138,18 +138,18 @@ exports.channelVideos = async (req, res) => {
         "total_records":0,
         "data": {}
     };
-    
+
     try {
         const channelType = typeof req.params.type != 'undefined' ? parseInt(req.params.type) : 1;
         let channelId = '';
-        if(channelType == 1){ // Live
+        if(channelType == 1){ // Live channel videos
             channelId = process.env.CHANNEL_LIVE;
             responseFormat.total_records = 123;
         }
-        else if(channelType == 2){ // instant channel
+        else if(channelType == 2){ // instant channel videos
             channelId = process.env.INSTANT_VIDEOS;
         }
-        else if(channelType == 3){
+        else if(channelType == 3){ // Live plus channel videos
             channelId = process.env.CHANNEL_LIVE_PLUS;
             responseFormat.total_records = 132;
         }
