@@ -134,6 +134,7 @@ exports.channelVideos = async (req, res) => {
         "success": false,
         "status_code":'',
         "message": "",
+        "total_records":0,
         "data": {}
       };
     try {
@@ -141,13 +142,15 @@ exports.channelVideos = async (req, res) => {
         console.log("channelType...........", channelType);
         let channelId = '';
         if(channelType == 1){ // Live
-            channelId = 'x4hskyp019znhujikckx';
+            channelId = process.env.CHANNEL_LIVE;
+            responseFormat.total_records = 123;
         }
         else if(channelType == 2){ // instant channel
-            channelId = 'qcttyqg1w3rqumbdxojb';
+            channelId = process.env.INSTANT_VIDEOS;
         }
-        else{
-            channelId = 'x4hskyp019znhujikckx';
+        else if(channelType == 3){
+            channelId = process.env.CHANNEL_LIVE;
+            responseFormat.total_records = 123;
         }
         
         const token = await getAuthToken()
@@ -165,12 +168,10 @@ exports.channelVideos = async (req, res) => {
             // The whole response has been received. Print out the result.
             boxCastResp.on('end', () => {
                 let TotalRecords = JSON.parse(data).length;
-                responseFormat = {
-                    "success": true,
-                    "status_code":200,
-                    "message": TotalRecords > 0 ? "Record(s) found." : 'No record(s) found',
-                    "data": JSON.parse(data)
-                };
+                responseFormat.success = true;
+                responseFormat.status_code = 200;
+                responseFormat.message =  TotalRecords > 0 ? "Record(s) found." : 'No record(s) found';
+                responseFormat.data = JSON.parse(data);
                 return res.status(200).json(responseFormat);
             });
         })
