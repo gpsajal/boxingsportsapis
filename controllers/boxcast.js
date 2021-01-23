@@ -1,5 +1,6 @@
 const r2 = require('r2');
 
+const https = require('https');
 
 const liveChannelId = process.env.CHANNEL_LIVE || 'x4hskyp019znhujikckx'
 
@@ -20,7 +21,7 @@ exports.getAuth = async (req, res) => {
             message: 'Auth info fetched successfully.'
         })
     } catch (error) {
-        logger.error(error)
+        console.log("channelVideos Err", error);
         return res.status(500).json(utils.serverErrorMsg(error))
     }
 }
@@ -39,7 +40,7 @@ const getAuthToken = async () => {
         const resp = await r2.post('https://auth.boxcast.com/oauth2/token', {headers, body}).json
         return resp.access_token
     } catch (error) {
-        logger.error(error)
+        console.log("getAuthToken Err", error);
         throw new Error(error)
     }
 };
@@ -68,7 +69,7 @@ exports.channelsList = async (req, res) => {
             "message": "All channels fetched successfully.",
             "data": channels
         };
-        return res.status(400).json(responseFormat);
+        return res.status(200).json(responseFormat);
 
         // return res.json({
         //     data: channels,
@@ -77,7 +78,7 @@ exports.channelsList = async (req, res) => {
         //     message: 'All channels fetched successfully.'
         // })
     } catch (error) {
-        logger.error(error);
+        console.log("channelsList Err", error);
         responseFormat.status_code = 400;
         responseFormat.message = utils.serverErrorMsg(error);
         return res.status(500).json(responseFormat);
@@ -109,9 +110,9 @@ exports.broadcastsList = async (req, res) => {
             "message": "All broadcasts fetched successfully.",
             "data": broadcasts
         };
-        return res.status(400).json(responseFormat);
+        return res.status(200).json(responseFormat);
     } catch (error) {
-        logger.error(error);
+        console.log("broadcastsList Err", error);
         responseFormat.status_code = 400;
         responseFormat.message = utils.serverErrorMsg(error);
         return res.status(500).json(responseFormat);
@@ -122,12 +123,12 @@ exports.broadcastsList = async (req, res) => {
  * API to get channel detail
  */
 exports.channelVideos = async (req, res) => {
-    console.log("inside channelVideos....");
+    console.log("inside channelVideos....", req.body, req.query);
 
-    const sortField = req.query.sort || '-starts_at'
-    const limit = req.query.limit || '50'
-    const page = req.query.page || '0'
-    const search = req.query.search || ''
+    const sortField = req.body.sort || '-starts_at'
+    const limit = req.body.limit || 50
+    const page = req.body.page || 0
+    const search = req.body.search || ''
 
     var responseFormat = {
         "success": false,
@@ -137,32 +138,47 @@ exports.channelVideos = async (req, res) => {
       };
     try {
         const channelType = typeof req.params.type != 'undefined' ? parseInt(req.params.type) : 1;
+        console.log("channelType...........", channelType);
         let channelId = '';
         if(channelType == 1){ // Live
             channelId = 'x4hskyp019znhujikckx';
         }
-        else{
+        else if(channelType == 2){ // instant channel
             channelId = 'qcttyqg1w3rqumbdxojb';
         }
-        console.log("channelType....", channelType);
+        else{
+            channelId = 'x4hskyp019znhujikckx';
+        }
+        
         const token = await getAuthToken()
         const headers = {
             'Authorization': `Bearer ${token}`
         }
-        https://api.boxcast.com/channels/x4hskyp019znhujikckx/broadcasts?q=timeframe%3Arelevant%20timeframe%3Anext&s=-starts_at&l=5&p=0
-
-        var channelAllVideos = await r2(`https://api.boxcast.com/account/channels/${channelId}/broadcasts`, { headers }).json;
-        //var channelAllVideos = await r2(`https://api.boxcast.com/account/channels/${channelId}/broadcasts?l=${limit}&p=${page}&s=${sortField}`,{ headers }).json;
-
-        var responseFormat = {
-            "success": true,
-            "status_code":200,
-            "message": "Channel detail fetched successfully.",
-            "data": channelAllVideos
-        };
-        return res.status(200).json(responseFormat);
+        let BoxCastAPiUrl = `https://api.boxcast.com/channels/${channelId}/broadcasts?s=${sortField}&p=${page}&l=${limit}`;
+        console.log("BoxCastAPiUrl...........", BoxCastAPiUrl);
+        https.get(BoxCastAPiUrl, (boxCastResp)=>{
+            let data = '';
+            // A chunk of data has been received.
+            boxCastResp.on('data', (chunk) => {
+                data += chunk;
+            });
+            // The whole response has been received. Print out the result.
+            boxCastResp.on('end', () => {
+                let TotalRecords = JSON.parse(data).length;
+                var responseFormat = {
+                    "success": true,
+                    "status_code":200,
+                    "message": TotalRecords > 0 ? "Record(s) found." : 'No record(s) found',
+                    "data": JSON.parse(data)
+                };
+                return res.status(200).json(responseFormat);
+            });
+        })
+        .on("error", (err) => {
+            console.log("BoxCast Error: ", err.message);
+        });       
     } catch (error) {
-        logger.error(error);
+        console.log("channelVideos Err", error);
         responseFormat.status_code = 400;
         responseFormat.message = utils.serverErrorMsg(error);
         return res.status(500).json(responseFormat);

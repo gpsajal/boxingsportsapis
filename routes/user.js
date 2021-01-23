@@ -24,7 +24,7 @@ router.get(`/channels`, boxcastController.channelsList);
 
 router.get('/broadcasts', boxcastController.broadcastsList);
 
-router.get(`/channelvideos/:type`, boxcastController.channelVideos);
+router.post(`/channelvideos/:type`, boxcastController.channelVideos);
 
 router.post('/register', userController.register);
 
