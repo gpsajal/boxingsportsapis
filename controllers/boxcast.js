@@ -125,10 +125,7 @@ exports.broadcastsList = async (req, res) => {
  * API to get channel detail
  */
 exports.channelVideos = async (req, res) => {
-
-    
     console.log("inside channelVideos....", moment().subtract(24, 'hours').format(), moment().add(3, 'hours').add(5, 'minutes').format());
-
     const sortField = req.body.sort || '-starts_at'
     const limit = req.body.limit || 50
     const page = req.body.page || 0
@@ -140,10 +137,10 @@ exports.channelVideos = async (req, res) => {
         "message": "",
         "total_records":0,
         "data": {}
-      };
+    };
+    
     try {
         const channelType = typeof req.params.type != 'undefined' ? parseInt(req.params.type) : 1;
-        //console.log("channelType...........", channelType);
         let channelId = '';
         if(channelType == 1){ // Live
             channelId = process.env.CHANNEL_LIVE;
@@ -156,37 +153,36 @@ exports.channelVideos = async (req, res) => {
             channelId = process.env.CHANNEL_LIVE_PLUS;
             responseFormat.total_records = 132;
         }
-        else if(channelType == 4){
+        else if(channelType == 4){ // Recent videos filtered from Live
             channelId = process.env.CHANNEL_LIVE;
             responseFormat.total_records = 0;
         }
-        
+        else if(channelType == 5){ // Recent videos filtered from LivePlus
+            channelId = process.env.CHANNEL_LIVE_PLUS;
+            responseFormat.total_records = 0;
+        }        
         const token = await getAuthToken()
         const headers = {
             'Authorization': `Bearer ${token}`
         }
         let BoxCastAPiUrl = `https://api.boxcast.com/channels/${channelId}/broadcasts?s=${sortField}&p=${page}&l=${limit}`;
-        //console.log("BoxCastAPiUrl...........", BoxCastAPiUrl);
         https.get(BoxCastAPiUrl, (boxCastResp)=>{
             let data = '';
-            // A chunk of data has been received.
             boxCastResp.on('data', (chunk) => {
                 data += chunk;
             });
-            // The whole response has been received. Print out the result.
             boxCastResp.on('end', () => {
                 responseFormat.success = true;
                 responseFormat.status_code = 200;
                 let TotalRecords = JSON.parse(data).length;
                 let allVideoResults = JSON.parse(data);
-                if(channelType == 4 && TotalRecords > 0){ // Filter Recent Videos
+                if((channelType == 4 || channelType == 5) && TotalRecords > 0){ // Filter Recent Videos
                     let recentVideos = [];
                     let prevDate = moment().subtract(24, 'hours').format();
                     allVideoResults.forEach(element => { 
                         if(prevDate < element.starts_at){
                             recentVideos.push(element);
                         }
-                        //console.log("allVideoResults...........", element); 
                     });
                     responseFormat.total_records = recentVideos.length;
                     responseFormat.data = recentVideos;
