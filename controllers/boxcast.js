@@ -2,6 +2,8 @@ const r2 = require('r2');
 
 const https = require('https');
 
+var moment = require('moment'); // require
+
 const liveChannelId = process.env.CHANNEL_LIVE || 'x4hskyp019znhujikckx'
 
 // Test API for Auth
@@ -123,7 +125,9 @@ exports.broadcastsList = async (req, res) => {
  * API to get channel detail
  */
 exports.channelVideos = async (req, res) => {
-    console.log("inside channelVideos....", req.body, req.query);
+
+    
+    console.log("inside channelVideos....", moment().subtract(24, 'hours').format(), moment().add(3, 'hours').add(5, 'minutes').format());
 
     const sortField = req.body.sort || '-starts_at'
     const limit = req.body.limit || 50
@@ -152,6 +156,10 @@ exports.channelVideos = async (req, res) => {
             channelId = process.env.CHANNEL_LIVE_PLUS;
             responseFormat.total_records = 132;
         }
+        else if(channelType == 4){
+            channelId = process.env.CHANNEL_LIVE;
+            responseFormat.total_records = 0;
+        }
         
         const token = await getAuthToken()
         const headers = {
@@ -167,12 +175,29 @@ exports.channelVideos = async (req, res) => {
             });
             // The whole response has been received. Print out the result.
             boxCastResp.on('end', () => {
-                let TotalRecords = JSON.parse(data).length;
                 responseFormat.success = true;
                 responseFormat.status_code = 200;
-                responseFormat.message =  TotalRecords > 0 ? "Record(s) found." : 'No record(s) found';
-                responseFormat.data = JSON.parse(data);
-                return res.status(200).json(responseFormat);
+                let TotalRecords = JSON.parse(data).length;
+                let allVideoResults = JSON.parse(data);
+                if(channelType == 4 && TotalRecords > 0){ // Filter Recent Videos
+                    let recentVideos = [];
+                    let prevDate = moment().subtract(24, 'hours').format();
+                    allVideoResults.forEach(element => { 
+                        if(prevDate < element.starts_at){
+                            recentVideos.push(element);
+                        }
+                        console.log("allVideoResults...........", element); 
+                    });
+                    responseFormat.total_records = recentVideos.length;
+                    responseFormat.data = recentVideos;
+                    responseFormat.message =  recentVideos.length > 0 ? "Record(s) found." : 'No record(s) found';
+                    return res.status(200).json(responseFormat);
+                }
+                else{
+                    responseFormat.message =  TotalRecords > 0 ? "Record(s) found." : 'No record(s) found';
+                    responseFormat.data = allVideoResults;
+                    return res.status(200).json(responseFormat);
+                }
             });
         })
         .on("error", (err) => {
