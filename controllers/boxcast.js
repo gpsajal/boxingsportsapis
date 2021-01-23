@@ -144,14 +144,14 @@ exports.channelVideos = async (req, res) => {
         let channelId = '';
         if(channelType == 1){ // Live channel videos
             channelId = process.env.CHANNEL_LIVE;
-            responseFormat.total_records = 123;
+            responseFormat.total_records = 1000;
         }
         else if(channelType == 2){ // instant channel videos
             channelId = process.env.INSTANT_VIDEOS;
         }
         else if(channelType == 3){ // Live plus channel videos
             channelId = process.env.CHANNEL_LIVE_PLUS;
-            responseFormat.total_records = 132;
+            responseFormat.total_records = 1000;
         }
         else if(channelType == 4){ // Recent videos filtered from Live
             channelId = process.env.CHANNEL_LIVE;
