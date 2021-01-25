@@ -179,7 +179,7 @@ exports.channelVideos = async (req, res) => {
                 let TotalRecords = allVideoResults.length;
                 responseFormat.message =  TotalRecords > 0 ? "Record(s) found." : 'No record(s) found';
                 allVideoResults.forEach(element => { 
-                    if(currentDate <= element.starts_at){
+                    if(currentDate <= element.stops_at){
                         LiveUpcomingVideos.push(element);
                     }
                     else{
