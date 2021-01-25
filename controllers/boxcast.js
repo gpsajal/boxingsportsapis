@@ -174,21 +174,26 @@ exports.channelVideos = async (req, res) => {
             boxCastResp.on('end', () => {
                 responseFormat.success = true;
                 responseFormat.status_code = 200;
+                responseFormat.total_records = 1000;
                 let currentDate = moment().format();
                 let allVideoResults = JSON.parse(data);
                 let TotalRecords = allVideoResults.length;
                 responseFormat.message =  TotalRecords > 0 ? "Record(s) found." : 'No record(s) found';
-                allVideoResults.forEach(element => { 
-                    if(currentDate <= element.stops_at){
-                        LiveUpcomingVideos.push(element);
-                    }
-                    else{
-                        RecentVideos.push(element);
-                    }
-                });
-                responseFormat.total_records = 1000;
-                responseFormat.data.live = LiveUpcomingVideos;
-                responseFormat.data.recent = RecentVideos;
+                if(channelType == 2){
+                    responseFormat.data = allVideoResults;
+                }
+                else{
+                    allVideoResults.forEach(element => { 
+                        if(currentDate <= element.stops_at){
+                            LiveUpcomingVideos.push(element);
+                        }
+                        else{
+                            RecentVideos.push(element);
+                        }
+                    });                   
+                    responseFormat.data.live = LiveUpcomingVideos;
+                    responseFormat.data.recent = RecentVideos;
+                }               
                 return res.status(200).json(responseFormat);
             });
         })
