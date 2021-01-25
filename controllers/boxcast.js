@@ -183,7 +183,14 @@ exports.channelVideos = async (req, res) => {
                     responseFormat.data = allVideoResults;
                 }
                 else{
-                    allVideoResults.forEach(element => { 
+                    allVideoResults.forEach(element => {
+                        if(element.starts_at <= currentDate && currentDate <= element.stops_at){
+                            element.isLive = 1;
+                        }
+                        else{
+                            element.isLive = 0;
+                        }
+
                         if(currentDate <= element.stops_at){
                             LiveUpcomingVideos.push(element);
                         }
