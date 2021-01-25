@@ -131,6 +131,8 @@ exports.channelVideos = async (req, res) => {
     const page = req.body.page || 0
     const search = req.body.search || ''
 
+    console.log("sortField....", sortField);
+
     var responseFormat = {
         "success": false,
         "status_code":'',
@@ -141,6 +143,8 @@ exports.channelVideos = async (req, res) => {
 
     try {
         const channelType = typeof req.params.type != 'undefined' ? parseInt(req.params.type) : 1;
+        
+
         let channelId = '';
         if(channelType == 1){ // Live channel videos
             channelId = process.env.CHANNEL_LIVE;
@@ -160,11 +164,15 @@ exports.channelVideos = async (req, res) => {
         else if(channelType == 5){ // Recent videos filtered from LivePlus
             channelId = process.env.CHANNEL_LIVE_PLUS;
             responseFormat.total_records = 0;
-        }        
+        }
         const token = await getAuthToken()
         const headers = {
             'Authorization': `Bearer ${token}`
         }
+
+        let LiveUpcomingVideos = [];
+        let RecentVideos = [];
+
         let BoxCastAPiUrl = `https://api.boxcast.com/channels/${channelId}/broadcasts?s=${sortField}&p=${page}&l=${limit}`;
         https.get(BoxCastAPiUrl, (boxCastResp)=>{
             let data = '';
@@ -176,24 +184,37 @@ exports.channelVideos = async (req, res) => {
                 responseFormat.status_code = 200;
                 let TotalRecords = JSON.parse(data).length;
                 let allVideoResults = JSON.parse(data);
-                if((channelType == 4 || channelType == 5) && TotalRecords > 0){ // Filter Recent Videos
-                    let recentVideos = [];
-                    let prevDate = moment().subtract(24, 'hours').format();
-                    allVideoResults.forEach(element => { 
-                        if(prevDate < element.starts_at){
-                            recentVideos.push(element);
-                        }
-                    });
-                    responseFormat.total_records = recentVideos.length;
-                    responseFormat.data = recentVideos;
-                    responseFormat.message =  recentVideos.length > 0 ? "Record(s) found." : 'No record(s) found';
-                    return res.status(200).json(responseFormat);
-                }
-                else{
-                    responseFormat.message =  TotalRecords > 0 ? "Record(s) found." : 'No record(s) found';
-                    responseFormat.data = allVideoResults;
-                    return res.status(200).json(responseFormat);
-                }
+                let currentDate = moment().format();
+                allVideoResults.forEach(element => { 
+                    if(currentDate <= element.starts_at){
+                        LiveUpcomingVideos.push(element);
+                    }
+                    else{
+                        RecentVideos.push(element);
+                    }
+                });
+                responseFormat.total_records = 1000;
+                responseFormat.data.live = LiveUpcomingVideos;
+                responseFormat.data.recent = RecentVideos;
+                return res.status(200).json(responseFormat);
+
+                // if((channelType == 4 || channelType == 5) && TotalRecords > 0){ // Filter Recent Videos
+                //     let recentVideos = [];                   
+                //     allVideoResults.forEach(element => { 
+                //         if(prevDate < element.starts_at){
+                //             recentVideos.push(element);
+                //         }
+                //     });
+                    
+
+                //     responseFormat.message =  recentVideos.length > 0 ? "Record(s) found." : 'No record(s) found';
+                //     return res.status(200).json(responseFormat);
+                // }
+                // else{
+                //     responseFormat.message =  TotalRecords > 0 ? "Record(s) found." : 'No record(s) found';
+                //     responseFormat.data = allVideoResults;
+                //     return res.status(200).json(responseFormat);
+                // }
             });
         })
         .on("error", (err) => {
