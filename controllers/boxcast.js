@@ -157,6 +157,10 @@ exports.channelVideos = async (req, res) => {
             channelId = process.env.CHANNEL_LIVE_PLUS;
             responseFormat.total_records = 1000;
         }
+        else if(channelType == 4){ // Tourney channel videos
+            channelId = process.env.CHANNEL_TOURNEY;
+            responseFormat.total_records = 1000;
+        }
         const token = await getAuthToken()
         const headers = {
             'Authorization': `Bearer ${token}`
