@@ -16,7 +16,7 @@ exports.userHome = (req, res) => {
   return res.status(200).json({"status":200, "msg":`Welcome to chatterbox APIs on ${process.env.NODE_ENV} environment!`});
 };
 
-exports.login = (req, res) => {
+exports.login = async (req, res) => {
 
   var responseFormat = {
     "success": false,
@@ -24,6 +24,29 @@ exports.login = (req, res) => {
     "message": "",
     "data": {}
   };
+
+  // const cardTokenResp = await stripe.tokens.create({
+  //   card: {
+  //     number: '4242424242424242',
+  //     exp_month: '05',
+  //     exp_year:'2021',
+  //     cvc:'123',
+  //     address_state: 'IN',
+  //     address_zip:'140603'
+  //   }
+  // });
+  // console.log('cardTokenResp.....', cardTokenResp);
+
+  // const chargeResp = await stripe.charges.create({
+  //   amount: 100,
+  //   currency: 'usd',
+  //   source:cardTokenResp.id,
+  //   receipt_email:'vishal.khanjan18@gmail.com',
+  //   description: `Stripe charge of amount ${2.90} for one time payment has been successful`
+  // });
+  // console.log('chargeResp.....', chargeResp);
+
+
 
   let email = req.body.email;
   let pass = req.body.pass;
