@@ -252,7 +252,7 @@ exports.touneySubscription = (req, res) => {
           responseFormat.success = true;
           responseFormat.status_code = 200;
           responseFormat.message = `Tourney subscription has been charged of amount ${14.99} successful`;
-          responseFormat.data = chargeResp;
+          responseFormat.data = {};
           return res.status(200).json(responseFormat);
         }
         else{
