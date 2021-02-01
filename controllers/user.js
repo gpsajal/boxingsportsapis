@@ -172,6 +172,14 @@ exports.register = (req, res) => {
                   })
                   .then((subscriptionResp)=>{
                     console.log("subscriptionResp", subscriptionResp.id);
+                    User.updatePlanType(customerResp.id, 'liveplus')
+                    .then(([updatePlanResp, fieldData])=>{
+                      console.log('fieldData.....', fieldData);
+                      console.log('updatePlanResp.....', updatePlanResp);
+                    })
+                    .catch((updatePlanErr)=>{
+                      console.log('updatePlanErr.....', updatePlanErr);
+                    });
                     responseFormat.success = true;
                     responseFormat.status_code = 200;
                     responseFormat.message = 'User registered successfully and subscription done!';
