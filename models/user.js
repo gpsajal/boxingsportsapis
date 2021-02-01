@@ -31,6 +31,15 @@ module.exports = class User {
    return db.execute("SELECT * FROM users WHERE email_address = ? LIMIT 1", [email]);
   }
 
+  static findUserById(userId) {
+    return db.execute("SELECT * FROM users WHERE id = ? LIMIT 1", [userId]);
+  }
+
+  static updatePlanType(userId, planType=null) {
+    return db.execute("UPDATE users SET planType=? WHERE id = ? LIMIT 1", [planType,userId]);
+  }
+
+
   static findUserByEmailPass(email, pass) {
     return db.execute("SELECT * FROM users WHERE email_address = ? AND password = ? LIMIT 1", [email, pass]);
   }

@@ -25,28 +25,7 @@ exports.login = async (req, res) => {
     "data": {}
   };
 
-  // const cardTokenResp = await stripe.tokens.create({
-  //   card: {
-  //     number: '4242424242424242',
-  //     exp_month: '05',
-  //     exp_year:'2021',
-  //     cvc:'123',
-  //     address_state: 'IN',
-  //     address_zip:'140603'
-  //   }
-  // });
-  // console.log('cardTokenResp.....', cardTokenResp);
-
-  // const chargeResp = await stripe.charges.create({
-  //   amount: 100,
-  //   currency: 'usd',
-  //   source:cardTokenResp.id,
-  //   receipt_email:'vishal.khanjan18@gmail.com',
-  //   description: `Stripe charge of amount ${2.90} for one time payment has been successful`
-  // });
-  // console.log('chargeResp.....', chargeResp);
-
-
+ 
 
   let email = req.body.email;
   let pass = req.body.pass;
@@ -234,9 +213,68 @@ exports.register = (req, res) => {
   });
 };
 
+exports.touneySubscription = (req, res) => {
+  var responseFormat = {
+    "success": false,
+    "status_code":'',
+    "message": "",
+    "data": {}
+  };
+  console.log("Inside touneySubscription...");  
+  let userId = req.body.userId;
+  let payToken = req.body.payToken;
+  if(typeof userId != 'undefined' && parseInt(userId) > 0 && typeof payToken == 'undefined'){
+    User.findUserById(userId)
+    .then(async ([emailResults, fieldData])=>{
+      if(emailResults.length == 0){
+        responseFormat.status_code = 400;
+        responseFormat.message = "User does not exist with email address";
+        return res.status(400).json(responseFormat);
+      }
+      else{
+        const chargeResp = await stripe.charges.create({
+          amount: 1499,
+          currency: 'usd',
+          source:payToken,
+          receipt_email: results[0].email_address,
+          description: `Tourney subscription has been charged of amount ${14.99} successful`
+        });
+        console.log('chargeResp.....', chargeResp);
+        if(chargeResp.status == 'succeeded'){
+          User.updatePlanType(userId, 'tourney')
+          .then(([updatePlanResp, fieldData])=>{
+            console.log('fieldData.....', fieldData);
+            console.log('updatePlanResp.....', updatePlanResp);
+          })
+          .catch((updatePlanErr)=>{
+            console.log('updatePlanErr.....', updatePlanErr);
+          });
+          responseFormat.success = true;
+          responseFormat.status_code = 200;
+          responseFormat.message = `Tourney subscription has been charged of amount ${14.99} successful`;
+          responseFormat.data = chargeResp;
+        }
+        else{
+          responseFormat.status_code = 400;
+          responseFormat.message = "Stripe payment error";
+          return res.status(400).json(responseFormat);
+        }
+      }
+    })
+    .catch((usrErr)=>{
+      console.log("usrErr", usrErr);
+      responseFormat.status_code = 400;
+      responseFormat.message = "User does exist!";
+      return res.status(400).json(responseFormat);
+    });
+  }
+  else{
+    responseFormat.status_code = 400;
+    responseFormat.message = "Please provide user and payment token";
+    return res.status(400).json(responseFormat);
+  }
+};
+
 exports.myProfile = (req, res)=>{
-  
   return res.json({"response":"authorization succeed"});
-
-
 };

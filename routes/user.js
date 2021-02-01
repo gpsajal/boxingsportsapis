@@ -28,6 +28,8 @@ router.post(`/channelvideos/:type`, boxcastController.channelVideos);
 
 router.post('/register', userController.register);
 
+router.post('/touneySubscription', userController.touneySubscription);
+
 router.post('/profile', verifyAuthToken, userController.myProfile);
 
 function verifyAuthToken(req, res, moveNext){    
