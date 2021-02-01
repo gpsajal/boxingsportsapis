@@ -17,16 +17,12 @@ exports.userHome = (req, res) => {
 };
 
 exports.login = async (req, res) => {
-
   var responseFormat = {
     "success": false,
     "status_code":'',
     "message": "",
     "data": {}
   };
-
- 
-
   let email = req.body.email;
   let pass = req.body.pass;
   if(typeof email == 'undefined' || email == '' || typeof pass == 'undefined' || pass == ''){
@@ -66,7 +62,7 @@ exports.login = async (req, res) => {
             "first_name":results[0].first_name,
             "last_name":results[0].last_name,
             "email_address":results[0].email_address,
-            "planType":results[0].planType,
+            "isTourneyUser":results[0].planType == 'tourney' ? 1 : 0,
             "token": jwtToken
           }
           return res.status(200).json(responseFormat);
@@ -221,13 +217,15 @@ exports.touneySubscription = (req, res) => {
     "message": "",
     "data": {}
   };
-  console.log("Inside touneySubscription...");  
-  let userId = req.body.userId;
+  let userId = parseInt(req.body.userId);
   let payToken = req.body.payToken;
-  if(typeof userId != 'undefined' && parseInt(userId) > 0 && typeof payToken == 'undefined'){
+  
+  console.log("Inside touneySubscription...", req.body, parseInt(userId));  
+  
+  if(typeof userId != 'undefined' && userId > 0 && typeof payToken != 'undefined'){
     User.findUserById(userId)
-    .then(async ([emailResults, fieldData])=>{
-      if(emailResults.length == 0){
+    .then(async ([results, fieldData])=>{
+      if(results.length == 0){
         responseFormat.status_code = 400;
         responseFormat.message = "User does not exist with email address";
         return res.status(400).json(responseFormat);
