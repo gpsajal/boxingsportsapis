@@ -63,6 +63,7 @@ exports.login = async (req, res) => {
             "last_name":results[0].last_name,
             "email_address":results[0].email_address,
             "isTourneyUser":results[0].planType == 'tourney' ? 1 : 0,
+            "isLivePlusUser":results[0].planType == 'liveplus' ? 1 : 0,
             "token": jwtToken
           }
           return res.status(200).json(responseFormat);
