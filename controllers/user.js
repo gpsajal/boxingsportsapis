@@ -86,6 +86,7 @@ exports.login = async (req, res) => {
             "first_name":results[0].first_name,
             "last_name":results[0].last_name,
             "email_address":results[0].email_address,
+            "planType":results[0].planType,
             "token": jwtToken
           }
           return res.status(200).json(responseFormat);
