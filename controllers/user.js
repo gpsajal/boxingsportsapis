@@ -62,6 +62,7 @@ exports.login = async (req, res) => {
             email: results[0].email_address,
           }, process.env.JWT_SECRET, {expiresIn: '3600s'});
           responseFormat.data = {
+            "user_id":results[0].id,
             "first_name":results[0].first_name,
             "last_name":results[0].last_name,
             "email_address":results[0].email_address,
