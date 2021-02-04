@@ -125,8 +125,9 @@ exports.broadcastsList = async (req, res) => {
  * API to get channel detail
  */
 exports.channelVideos = async (req, res) => {
+    
     console.log("inside channelVideos....", moment().subtract(24, 'hours').format(), moment().add(3, 'hours').add(5, 'minutes').format());
-    const sortField = req.body.sort || '-starts_at'
+    let sortField = req.body.sort || '-starts_at'
     const limit = req.body.limit || 50
     const page = req.body.page || 0
     const search = req.body.search || ''
