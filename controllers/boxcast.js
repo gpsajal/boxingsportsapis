@@ -126,7 +126,7 @@ exports.broadcastsList = async (req, res) => {
  */
 exports.channelVideos = async (req, res) => {
     console.log("inside channelVideos....", moment().subtract(24, 'hours').format(), moment().add(3, 'hours').add(5, 'minutes').format());
-    const sortField = req.body.sort || '-starts_at'
+    const sortField = req.body.sort || 'starts_at'
     const limit = req.body.limit || 50
     const page = req.body.page || 0
     const search = req.body.search || ''
@@ -187,6 +187,8 @@ exports.channelVideos = async (req, res) => {
                     responseFormat.data = allVideoResults;
                 }
                 else{
+                    allVideoResults = allVideoResults.sort((a, b) => b.starts_at - a.starts_at)
+
                     allVideoResults.forEach(element => {
                         if(element.starts_at <= currentDate && currentDate <= element.stops_at){
                             element.isLive = 1;
