@@ -18,8 +18,6 @@ router.get('/', userController.userHome);
 
 router.post('/login', userController.login);
 
-router.post('/login', userController.login);
-
 router.get(`/channels`, boxcastController.channelsList);
 
 router.get('/broadcasts', boxcastController.broadcastsList);
@@ -39,7 +37,7 @@ function verifyAuthToken(req, res, moveNext){
         return res.status(403).json({
             "success": false,
             "status_code":403,
-            "message": "Unauthorized Access"
+            "message": "Unauthorized Access1"
         });
     }
     if(typeof userid == 'undefined'){
@@ -57,16 +55,17 @@ function verifyAuthToken(req, res, moveNext){
                 return res.status(403).json({
                     "success": false,
                     "status_code":403,
-                    "message": "Unauthorized Access"
+                    "message": "Unauthorized Access2"
                 });
             }
             else if(authData.userid != userid){
                 return res.status(403).json({
                     "success": false,
                     "status_code":403,
-                    "message": "Unauthorized Access"
+                    "message": "Unauthorized Access3"
                 });
             }
+            req.body.userid = userid;
             moveNext();
         });        
     }

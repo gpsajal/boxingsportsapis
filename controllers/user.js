@@ -285,5 +285,37 @@ exports.touneySubscription = (req, res) => {
 };
 
 exports.myProfile = (req, res)=>{
-  return res.json({"response":"authorization succeed"});
+
+  var responseFormat = {
+    "success": false,
+    "status_code":'',
+    "message": "",
+    "data": {}
+  };
+  
+  let userid = req.body.userid;
+
+  if(typeof userid != 'undefined'){
+    User.findUserById(userid)
+    .then(([userInfo, fieldData])=>{
+      console.log("userInfo", userInfo[0].email_address);
+      let userProfileObj = {
+        first_name : userInfo[0].first_name,
+        last_name : userInfo[0].last_name,
+        email_address : userInfo[0].email_address,
+        planType : userInfo[0].planType
+      };
+      responseFormat.success = true;
+      responseFormat.status_code = 200;
+      responseFormat.message = `User profile found`;
+      responseFormat.data = userProfileObj;
+      return res.status(200).json(responseFormat);
+    })
+    .catch((error)=>{
+      console.log("error", error);
+      responseFormat.status_code = 400;
+      responseFormat.message = "User does not exist.";
+      return res.status(400).json(responseFormat);
+    });
+  }
 };
