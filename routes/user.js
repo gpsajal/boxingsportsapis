@@ -30,14 +30,14 @@ router.post('/tourneySubscription', userController.touneySubscription);
 
 router.post('/profile', verifyAuthToken, userController.myProfile);
 
-function verifyAuthToken(req, res, moveNext){    
+function verifyAuthToken(req, res, moveNext){
     const bearerHeader = req.headers['authorization'];
     const userid = parseInt(req.headers['userid']);
     if(typeof bearerHeader == 'undefined'){
         return res.status(403).json({
             "success": false,
             "status_code":403,
-            "message": "Unauthorized Access1"
+            "message": "Unauthorized Access"
         });
     }
     if(typeof userid == 'undefined'){
@@ -55,14 +55,14 @@ function verifyAuthToken(req, res, moveNext){
                 return res.status(403).json({
                     "success": false,
                     "status_code":403,
-                    "message": "Unauthorized Access2"
+                    "message": "Unauthorized Access"
                 });
             }
             else if(authData.userid != userid){
                 return res.status(403).json({
                     "success": false,
                     "status_code":403,
-                    "message": "Unauthorized Access3"
+                    "message": "Unauthorized Access"
                 });
             }
             req.body.userid = userid;
