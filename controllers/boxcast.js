@@ -204,12 +204,11 @@ exports.channelVideos = async (req, res) => {
                     }); 
                     console.log("LiveUpcomingVideos Before", LiveUpcomingVideos);
                     if(LiveUpcomingVideos.length > 0){
-                        LiveUpcomingVideosNew = LiveUpcomingVideos.sort((a, b) => moment(b.starts_at) - moment(a.starts_at));
-                        //objs.sort((a,b) => (a.last_nom > b.last_nom) ? 1 : ((b.last_nom > a.last_nom) ? -1 : 0))
-
+                        //LiveUpcomingVideosNew = LiveUpcomingVideos.sort((a, b) => moment(b.starts_at) - moment(a.starts_at));
+                        LiveUpcomingVideos.sort((a,b) => (a.starts_at > b.starts_at) ? 1 : ((b.starts_at > a.starts_at) ? -1 : 0))
                     }
-                    console.log("LiveUpcomingVideos After", LiveUpcomingVideosNew);
-                    responseFormat.data.live = LiveUpcomingVideosNew;
+                    console.log("LiveUpcomingVideos After", LiveUpcomingVideos);
+                    responseFormat.data.live = LiveUpcomingVideos;
                     responseFormat.data.recent = RecentVideos;
                 }               
                 return res.status(200).json(responseFormat);
