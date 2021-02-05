@@ -205,9 +205,11 @@ exports.channelVideos = async (req, res) => {
                     console.log("LiveUpcomingVideos Before", LiveUpcomingVideos);
                     if(LiveUpcomingVideos.length > 0){
                         LiveUpcomingVideosNew = LiveUpcomingVideos.sort((a, b) => moment(b.starts_at) - moment(a.starts_at));
+                        //objs.sort((a,b) => (a.last_nom > b.last_nom) ? 1 : ((b.last_nom > a.last_nom) ? -1 : 0))
+
                     }
                     console.log("LiveUpcomingVideos After", LiveUpcomingVideosNew);
-                    responseFormat.data.live = LiveUpcomingVideos;
+                    responseFormat.data.live = LiveUpcomingVideosNew;
                     responseFormat.data.recent = RecentVideos;
                 }               
                 return res.status(200).json(responseFormat);
