@@ -204,9 +204,9 @@ exports.channelVideos = async (req, res) => {
                     }); 
                     console.log("LiveUpcomingVideos Before", LiveUpcomingVideos);
                     if(LiveUpcomingVideos.length > 0){
-                        LiveUpcomingVideos = LiveUpcomingVideos.sort((a, b) => moment(b.starts_at) - moment(a.starts_at));
+                        LiveUpcomingVideosNew = LiveUpcomingVideos.sort((a, b) => moment(b.starts_at) - moment(a.starts_at));
                     }
-                    console.log("LiveUpcomingVideos After", LiveUpcomingVideos);
+                    console.log("LiveUpcomingVideos After", LiveUpcomingVideosNew);
                     responseFormat.data.live = LiveUpcomingVideos;
                     responseFormat.data.recent = RecentVideos;
                 }               
