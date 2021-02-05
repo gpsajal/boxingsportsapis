@@ -203,7 +203,7 @@ exports.channelVideos = async (req, res) => {
                         }
                     }); 
                     if(LiveUpcomingVideos.length > 0){
-                        LiveUpcomingVideos = LiveUpcomingVideos.sort((a, b) => b.starts_at - a.starts_at);                  
+                        LiveUpcomingVideos = LiveUpcomingVideos.sort((a, b) => a.starts_at - b.starts_at);                  
                     }
                     responseFormat.data.live = LiveUpcomingVideos;
                     responseFormat.data.recent = RecentVideos;
